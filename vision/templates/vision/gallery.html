@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery - Google I</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'vision/css/style.css' %}">
+    <style>
+        .gallery-container {
+            margin-bottom: 60px;
+        }
+        .gallery-item {
+            background: #1E1E1E;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s;
+            position: relative;
+        }
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(255, 0, 128, 0.2);
+        }
+        .gallery-image {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-bottom: 2px solid #00FFD1;
+        }
+        .gallery-content {
+            padding: 20px;
+        }
+        .gallery-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #fff;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .gallery-date {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+        .gallery-description {
+            background: #262626;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            border-left: 4px solid #7928CA;
+        }
+        .gallery-description::-webkit-scrollbar {
+            width: 8px;
+        }
+        .gallery-description::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 4px;
+        }
+        .gallery-description::-webkit-scrollbar-thumb {
+            background: #7928CA;
+            border-radius: 4px;
+        }
+        .gallery-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        .gallery-filter {
+            margin-bottom: 30px;
+        }
+        .empty-gallery {
+            text-align: center;
+            padding: 50px 0;
+            background: #1E1E1E;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: #FF0080;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 5px;
+            line-height: 1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-btn:hover {
+            color: #ff6bb3;
+            transform: scale(1.1);
+            background-color: rgba(255, 0, 128, 0.1);
+        }
+        .delete-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 0, 128, 0.3);
+        }
+        .btn-back {
+            color: #00FFD1;
+            background: transparent;
+            border: 2px solid #00FFD1;
+            transition: all 0.3s ease;
+        }
+        .btn-back:hover {
+            background: rgba(0, 255, 209, 0.1);
+            color: #00FFD1;
+        }
+        .gallery-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .delete-modal .modal-content {
+            background: #262626;
+            color: white;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .delete-modal .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .delete-modal .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .delete-modal .btn-secondary {
+            background: #333;
+            border: none;
+        }
+        .delete-modal .btn-danger {
+            background: linear-gradient(135deg, #FF0080, #7928CA);
+            border: none;
+        }
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        .delete-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            padding: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .delete-icon:hover {
+            background-color: rgba(255, 0, 128, 0.7);
+            transform: rotate(90deg);
+        }
+        .delete-form {
+            display: inline-block;
+        }
+        
+        /* Warning icon styling */
+        .warning-icon {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header text-center animate__animated animate__fadeIn">
+        <div class="container">
+            <h1 class="logo mb-0">
+                <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span> I
+            </h1>
+            <p class="mt-2">Your Image Analysis Gallery</p>
+        </div>
+    </div>
+    
+    <div class="container gallery-container">
+        <div class="gallery-toolbar">
+            <h2 class="animate__animated animate__fadeIn">Your Analysis History</h2>
+            <div class="d-flex">
+                {% if images %}
+                <button id="clear-gallery-btn" class="btn btn-danger me-3 animate__animated animate__fadeIn">
+                    Clear Gallery
+                </button>
+                {% endif %}
+                <a href="{% url 'vision:index' %}" class="btn btn-back animate__animated animate__fadeIn">
+                    Back to Analyzer
+                </a>
+            </div>
+        </div>
+        
+        {% if images %}
+            <div class="row">
+                {% for image in images %}
+                    <div id="image-{{ image.id }}" class="col-md-6 col-lg-4">
+                        <div class="gallery-item animate__animated animate__fadeIn">
+                            <img src="{{ image.image.url }}" alt="{{ image.title }}" class="gallery-image">
+                            
+                            <!-- Delete icon overlay on image -->
+                            <button type="button" class="delete-icon" data-bs-toggle="modal" data-bs-target="#deleteModal{{ image.id }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#FF0080" viewBox="0 0 16 16">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1z"/>
+                                </svg>
+                            </button>
+                            
+                            <div class="gallery-content">
+                                <div class="gallery-title">
+                                    <span>{{ image.title }}</span>
+                                </div>
+                                <div class="gallery-date">{{ image.uploaded_at|date:"F j, Y, g:i a" }}</div>
+                                <div class="gallery-description">{{ image.description|linebreaks }}</div>
+                                <div class="gallery-actions">
+                                    <a href="{{ image.image.url }}" target="_blank" class="btn btn-primary btn-sm">
+                                        View Full Image
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Delete Modal -->
+                            <div class="modal fade delete-modal" id="deleteModal{{ image.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ image.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel{{ image.id }}">Confirm Deletion</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="text-center mb-4">
+                                                <img src="{{ image.image.url }}" alt="{{ image.title }}" class="img-fluid rounded" style="max-height: 150px;">
+                                            </div>
+                                            <p>Are you sure you want to delete "<strong>{{ image.title }}</strong>"?</p>
+                                            <p class="text-danger small">This action cannot be undone.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <form id="deleteForm{{ image.id }}" action="{% url 'vision:delete_image' image.id %}" method="POST" class="delete-form">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger delete-confirm-btn">Delete Permanently</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-gallery animate__animated animate__fadeIn">
+                <h3>No Images Yet</h3>
+                <p class="text-muted">Upload and analyze your first image to start building your gallery.</p>
+                <a href="{% url 'vision:index' %}" class="btn btn-primary mt-3">Upload an Image</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Add Clear Gallery Modal at the bottom of the page -->
+    <div class="modal fade delete-modal" id="clearGalleryModal" tabindex="-1" aria-labelledby="clearGalleryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="clearGalleryModalLabel">Clear Entire Gallery</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4 warning-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="#FF0080" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-center text-danger mb-3">Warning: This Cannot Be Undone</h4>
+                    <p>You are about to delete <strong>all images and their analyses</strong> from your gallery. This action is permanent and cannot be recovered.</p>
+                    <p>Are you absolutely sure you want to proceed?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{% url 'vision:clear_gallery' %}" method="POST" class="delete-form">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Clear All Images</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add data-bs-toggle to clear gallery button
+            const clearGalleryBtn = document.getElementById('clear-gallery-btn');
+            if (clearGalleryBtn) {
+                clearGalleryBtn.setAttribute('data-bs-toggle', 'modal');
+                clearGalleryBtn.setAttribute('data-bs-target', '#clearGalleryModal');
+            }
+            
+            // Disable submit buttons when clicked to prevent double submission
+            const deleteForms = document.querySelectorAll('.delete-form');
+            deleteForms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = 'Deleting...';
+                    }
+                });
+            });
+            
+            // Handle anchor links for direct access to specific items
+            if (window.location.hash) {
+                const targetElement = document.querySelector(window.location.hash);
+                if (targetElement) {
+                    setTimeout(() => {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetElement.classList.add('animate__animated', 'animate__pulse');
+                    }, 300);
+                }
+            }
+        });
+    </script>
+</body>
+</html> 
