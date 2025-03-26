@@ -150,7 +150,14 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Server error occurred');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             clearInterval(messageInterval);
             loader.innerHTML = ''; // Clear loader content
@@ -176,8 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Animate description text typing effect
                 typeWriter(data.description, descriptionText);
             } else {
-                alert('Error: ' + data.error);
-                document.querySelector('.upload-container').style.display = 'block';
+                throw new Error(data.error || 'Failed to analyze image');
             }
         })
         .catch(error => {
@@ -185,24 +191,18 @@ document.addEventListener('DOMContentLoaded', function() {
             loader.innerHTML = ''; // Clear loader content
             loader.style.display = 'none';
             document.querySelector('.upload-container').style.display = 'block';
-            alert('Error: ' + error);
+            alert('Error: ' + error.message);
         });
     }
     
-    // Typing animation for description text
-    function typeWriter(text, element) {
-        element.textContent = '';
+    // Typewriter effect for description
+    function typeWriter(text, element, speed = 30) {
         let i = 0;
-        const speed = 5; // typing speed - lower is faster
+        element.innerHTML = '';
         
         function type() {
             if (i < text.length) {
-                // Append character and handle line breaks
-                if (text.charAt(i) === '\n') {
-                    element.innerHTML += '<br>';
-                } else {
-                    element.innerHTML += text.charAt(i);
-                }
+                element.innerHTML += text.charAt(i);
                 i++;
                 setTimeout(type, speed);
             }
