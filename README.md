@@ -17,8 +17,9 @@ Google I is a web application that allows users to upload images and receive det
 - **AI**: Google Generative AI API (Gemini 1.5 Flash)
 - **Styling**: Bootstrap, custom CSS animations
 - **Image Processing**: Pillow
+- **Deployment**: Render, Gunicorn, Whitenoise
 
-## Installation
+## Local Installation
 
 1. Clone the repository
 ```bash
@@ -28,7 +29,7 @@ cd google-I
 
 2. Install dependencies
 ```bash
-pip install django google-generativeai Pillow
+pip install -r requirements.txt
 ```
 
 3. Create necessary directories
@@ -36,17 +37,40 @@ pip install django google-generativeai Pillow
 mkdir -p media/images
 ```
 
-4. Run migrations
+4. Create a .env file with your environment variables:
+```
+DJANGO_SECRET_KEY=your-secret-key-here
+DEBUG=True
+GOOGLE_API_KEY=your-google-api-key-here
+```
+
+5. Run migrations
 ```bash
 python manage.py migrate
 ```
 
-5. Start the development server
+6. Start the development server
 ```bash
 python manage.py runserver
 ```
 
-6. Open your browser and navigate to http://127.0.0.1:8000/
+7. Open your browser and navigate to http://127.0.0.1:8000/
+
+## Deployment on Render
+
+1. Create a new Web Service on Render
+2. Connect your GitHub repository
+3. Configure the following settings:
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn google_eye.wsgi:application`
+   - Python Version: 3.9 or higher
+
+4. Add the following environment variables in Render:
+   - `DJANGO_SECRET_KEY`: Generate a secure secret key
+   - `DEBUG`: Set to `False`
+   - `GOOGLE_API_KEY`: Your Google API key
+
+5. Deploy your application
 
 ## Usage
 
@@ -59,7 +83,7 @@ python manage.py runserver
 
 ## Note
 
-This application requires a valid Google Generative AI API key to function. The key should be configured in the `vision/models.py` file.
+This application requires a valid Google Generative AI API key to function. The key should be configured in your environment variables.
 
 ## License
 

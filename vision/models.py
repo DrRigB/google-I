@@ -1,8 +1,13 @@
 from django.db import models
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Initialize the Google Generative AI client
-genai.configure(api_key="AIzaSyBYlG5hoYIgA3anX2_eFSd_8aFq2r6fHYA")
+genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 
 class Image(models.Model):
     title = models.CharField(max_length=200)
